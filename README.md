@@ -18,4 +18,4 @@ These skills will help evaluate the following research question:
 
 > Among Nobel Prize winners in Physics, Chemistry, and Biology, what is the relationship between scientific impact of a paper and the timing of the paper during a scientist's career? Does this relationship depend on a scientist's age, gender, team size, or prize category?
 
-![Project Logo](assets/nobel_prize_1280x640.jpeg)
+![](assets/nobel_prize_1280x640.jpeg)
