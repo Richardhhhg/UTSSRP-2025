@@ -149,7 +149,7 @@ def create_p_and_gender_data(field):
             'p-value': plist_to_add,
             'Gender': determine_laureate_genders(field)}
     d = pd.DataFrame(data)
-    d.to_csv('p_and_gender_data.csv', index=False)
+    d.to_csv(field + '_p_and_gender_data.csv', index=False)
 
 def add_citations_and_teamsize_to_csv(field):
     if field == "chem":
