@@ -4,9 +4,9 @@ from habanero import counts
 from habanero import cn
 import re
 
-chem = pd.read_csv('Chemistry publication record.csv')
-phys = pd.read_csv('Physics publication record.csv', encoding='latin-1')
-med = pd.read_csv('Medicine publication record.csv', encoding='latin-1')
+chem = pd.read_csv(r'C:\Users\Sam\PycharmProjects\UTSSRP-2025\data_nature_paper\Chemistry publication record.csv')
+phys = pd.read_csv(r'C:\Users\Sam\PycharmProjects\UTSSRP-2025\data_nature_paper\Physics publication record.csv', encoding='latin-1')
+med = pd.read_csv(r'C:\Users\Sam\PycharmProjects\UTSSRP-2025\data_nature_paper\Medicine publication record.csv', encoding='latin-1')
 
 cr = Crossref()
 
@@ -46,7 +46,7 @@ def find_med_p():
     med_laureates = []
     med_unique_names = med['Laureate name'].unique()
     for name in med_unique_names:
-        med_laureates.append(find_p(name, "chem"))
+        med_laureates.append(find_p(name, "med"))
     return med_laureates
 
 def find_team_size(doi):
@@ -164,5 +164,10 @@ def add_citations_and_teamsize_to_csv(field):
     combined_df = pd.concat([df, d], ignore_index=True)
     combined_df.to_csv('updated' + field + 'data.csv',index=False)
 
-
-
+if __name__ == "__main__":
+    create_p_and_gender_data("chem")
+    create_p_and_gender_data("phys")
+    create_p_and_gender_data("med")
+    add_citations_and_teamsize_to_csv("chem")
+    add_citations_and_teamsize_to_csv("phys")
+    add_citations_and_teamsize_to_csv("med")
