@@ -4,9 +4,9 @@ from habanero import counts
 from habanero import cn
 import re
 
-chem = pd.read_csv(r'C:\Users\Sam\PycharmProjects\UTSSRP-2025\data_nature_paper\Chemistry publication record.csv')
-phys = pd.read_csv(r'C:\Users\Sam\PycharmProjects\UTSSRP-2025\data_nature_paper\Physics publication record.csv', encoding='latin-1')
-med = pd.read_csv(r'C:\Users\Sam\PycharmProjects\UTSSRP-2025\data_nature_paper\Medicine publication record.csv', encoding='latin-1')
+chem = pd.read_csv('data_nature_paper/Chemistry publication record.csv')
+phys = pd.read_csv('data_nature_paper/Physics publication record.csv', encoding='latin-1')
+med = pd.read_csv('data_nature_paper/Medicine publication record.csv', encoding='latin-1')
 
 cr = Crossref()
 
