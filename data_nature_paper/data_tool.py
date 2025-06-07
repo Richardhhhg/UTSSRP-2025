@@ -86,8 +86,13 @@ def find_all_teamsizes(field):
         team_sizes += find_all_team_sizes(name, field)
     return team_sizes
 
-def find_citations(doi):
-    return counts.citation_count(doi= doi)
+def get_citation_count(doi):
+    try:
+        paper_citations = counts.citation_count(doi=doi)
+        return paper_citations
+    except Exception as e:
+        print(f"Error retrieving {doi}: {e}")
+        return None
 
 def find_citation_counts(laureate, field):
     """habanero takes forever, so use this function at your own risk"""
@@ -165,9 +170,33 @@ def add_citations_and_teamsize_to_csv(field):
     combined_df.to_csv('updated' + field + 'data.csv',index=False)
 
 if __name__ == "__main__":
-    create_p_and_gender_data("chem")
-    create_p_and_gender_data("phys")
-    create_p_and_gender_data("med")
-    add_citations_and_teamsize_to_csv("chem")
-    add_citations_and_teamsize_to_csv("phys")
-    add_citations_and_teamsize_to_csv("med")
+    chem['field'] = 'Chemistry'
+    phys['field'] = 'Physics'
+    med['field'] = 'Medicine'
+    df_chem_vals = pd.read_csv('chem_p_and_gender_data.csv')
+    df_med_vals = pd.read_csv('med_p_and_gender_data.csv')
+    df_phys_vals = pd.read_csv('phys_p_and_gender_data.csv')
+    df_chem_merged = chem.merge(df_chem_vals, on='Laureate name', how='left')
+    df_phys_merged = phys.merge(df_phys_vals, on='Laureate name', how='left')
+    df_med_merged = med.merge(df_med_vals, on='Laureate name', how='left')
+    df_all = pd.concat([df_chem_merged, df_med_merged, df_phys_merged], ignore_index=True)
+
+    n = len(df_all)
+    chunk_size = n // 8  # Integer division
+
+    split_1 = df_all.iloc[:chunk_size]
+    split_2 = df_all.iloc[chunk_size:2*chunk_size]
+    split_3 = df_all.iloc[2*chunk_size:3*chunk_size]
+    split_4 = df_all.iloc[3*chunk_size:4*chunk_size]
+    split_5 = df_all.iloc[4*chunk_size:5*chunk_size]
+    split_6 = df_all.iloc[5*chunk_size:6*chunk_size]
+    split_7 = df_all.iloc[6*chunk_size:7*chunk_size]
+    split_8 = df_all.iloc[7*chunk_size:]
+# SET X HERE FOR YOUR SPLIT
+    x = 7 # CHANGE THIS
+
+    split_7['citation_count'] = split_7['DOI'].apply(lambda d: get_citation_count(d)) # CHANGE THE X IN THIS
+    split_7.to_csv(f'split_{7}_citation_counts.csv', index=False) # CHANGE THE X IN THIS
+    split_8['citation_count'] = split_8['DOI'].apply(lambda d: get_citation_count(d)) # CHANGE THE X IN THIS
+    split_8.to_csv(f'split_{8}_citation_counts.csv', index=False) # CHANGE THE X IN THIS
+
