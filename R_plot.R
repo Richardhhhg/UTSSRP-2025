@@ -114,7 +114,7 @@ lm_plot <- ggplot(data, aes(x = P_Value, y = Citation_Percentile)) +
   theme_minimal()
 lm_plot
 
-
+# Scale log10 y
 data_1 <- df %>% filter(Prize_Winning == "YES")
 model_1 <- lm(Citations_Count ~ P_Value, data)
 summary(model_1)
@@ -142,3 +142,18 @@ anova_plot <- ggplot(combine_p, aes(x = P_bin, y = Citation_Percentile, fill = P
 anova_plot
 # p-value (Pr(>F)): 0.821, which is far above the 0.05 significance threshold, 
 # meaning P_bin has no significant effect on Citation_Percentile.
+
+# General Linear Model
+glm_model <- glm(Citation_Percentile ~ P_Value, data, family = gaussian(link = "identity"))
+summary(glm_model)
+# Still No Significant
+
+# Bayesian Hierarchical Model
+library(brms)
+
+bayesian_model <- brm(Citation_Percentile ~ P_Value + (1 | Field), 
+                      data = data, 
+                      family = gaussian(), 
+                      prior = prior(normal(0, 10), class = "b"))
+summary(bayesian_model)
+
