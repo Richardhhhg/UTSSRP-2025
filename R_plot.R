@@ -19,6 +19,10 @@ phys_p <- phys_p %>%
 med_p <- med_p %>%
   mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
 
+combine_p <- df %>%
+  mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
+
+
 
 # Plots over P_value
 chem_p_plot <- ggplot(chem_p, aes(x = Citation_Percentile)) +
@@ -123,3 +127,18 @@ lm_plot_1 <- ggplot(data_1, aes(x = P_Value, y = Citations_Count)) +
   scale_y_log10() +
   theme_minimal()
 lm_plot_1
+
+# Anova
+anova_model <- aov(Citation_Percentile ~ P_bin, data = combine_p)
+summary(anova_model)
+TukeyHSD(anova_model)
+
+anova_plot <- ggplot(combine_p, aes(x = P_bin, y = Citation_Percentile, fill = P_bin)) +
+  geom_boxplot() +
+  labs(title = "ANOVA: Citation Percentile by P_bin",
+       x = "P_bin",
+       y = "Citation Percentile") +
+  theme_minimal()
+anova_plot
+# p-value (Pr(>F)): 0.821, which is far above the 0.05 significance threshold, 
+# meaning P_bin has no significant effect on Citation_Percentile.
