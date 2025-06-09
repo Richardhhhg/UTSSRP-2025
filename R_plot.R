@@ -144,7 +144,7 @@ anova_plot
 # meaning P_bin has no significant effect on Citation_Percentile.
 
 # General Linear Model
-glm_model <- glm(Citation_Percentile ~ P_Value, data, family = gaussian(link = "identity"))
+glm_model <- glm(Citation_Percentile ~ P_Value, data, family = poisson(link = "identity"))
 summary(glm_model)
 # Still No Significant
 
