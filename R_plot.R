@@ -10,13 +10,13 @@ chem_p <- df %>% filter(Field == "Chemistry")
 phys_p <- df %>% filter(Field == "Physics")
 med_p <- df %>% filter(Field == "Medicine")
 
-chem_p <- chem_p %>%
+chem_p <- chem_p %>% filter(Prize_Winning == "YES") %>%
   mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
 
-phys_p <- phys_p %>%
+phys_p <- phys_p %>% filter(Prize_Winning == "YES") %>%
   mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
 
-med_p <- med_p %>%
+med_p <- med_p %>% filter(Prize_Winning == "YES") %>%
   mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
 
 combine_p <- df %>%
@@ -24,7 +24,7 @@ combine_p <- df %>%
 
 
 
-# Plots over P_value
+# Histogram binned by P_value
 chem_p_plot <- ggplot(chem_p, aes(x = Citation_Percentile)) +
   geom_histogram(binwidth = 0.05, fill = "blue", color = "black") +
   facet_wrap(~P_bin, ncol = 5, scales = "free_y") +
@@ -100,60 +100,69 @@ s_plot <- chem_filter %>%
   theme_minimal()
 s_plot
 
-# Linear Regression
-data <- df %>% filter(Prize_Winning == "YES")
-model <- lm(Citation_Percentile ~ P_Value, data)
-summary(model)
+# Linear Regression across fields
+data_chem <- combine_p %>% filter(Prize_Winning == "YES", Field == "Chemistry")
 
-
-lm_plot <- ggplot(data, aes(x = P_Value, y = Citation_Percentile)) +
+lm_chem_plot <- ggplot(data_chem, aes(x = P_Value, y = Citation_Percentile)) +
   geom_point(color = "red") +
   geom_smooth(method = "lm", color = "blue", se = FALSE) +
-  labs(title = "Linear Regression: Citation Percentile vs P_Value",
+  labs(title = "Linear Regression: Citation Percentile vs P_Value (Chemistry)",
        x = "P_Value", y = "Citation Percentile") +
   theme_minimal()
-lm_plot
+lm_chem_plot
 
-# Scale log10 y
-data_1 <- df %>% filter(Prize_Winning == "YES")
-model_1 <- lm(Citations_Count ~ P_Value, data)
-summary(model_1)
+chem_model <- lm(Citation_Percentile ~ P_Value, data = data_chem)
+summary(chem_model)
 
-lm_plot_1 <- ggplot(data_1, aes(x = P_Value, y = Citations_Count)) +
+data_phys <- combine_p %>% filter(Prize_Winning == "YES", Field == "Physics")
+
+lm_phys_plot <- ggplot(data_phys, aes(x = P_Value, y = Citation_Percentile)) +
   geom_point(color = "red") +
   geom_smooth(method = "lm", color = "blue", se = FALSE) +
-  labs(title = "Linear Regression: Citations Count (log10) vs P_Value",
-       x = "P_Value", y = "Citations Count (log10)") +
-  scale_y_log10() +
+  labs(title = "Linear Regression: Citation Percentile vs P_Value (Physics)",
+       x = "P_Value", y = "Citation Percentile") +
   theme_minimal()
-lm_plot_1
+lm_phys_plot
 
-# Anova
-anova_model <- aov(Citation_Percentile ~ P_bin, data = combine_p)
-summary(anova_model)
-TukeyHSD(anova_model)
+phys_model <- lm(Citation_Percentile ~ P_Value, data = data_phys)
+summary(phys_model)
 
-anova_plot <- ggplot(combine_p, aes(x = P_bin, y = Citation_Percentile, fill = P_bin)) +
-  geom_boxplot() +
-  labs(title = "ANOVA: Citation Percentile by P_bin",
-       x = "P_bin",
-       y = "Citation Percentile") +
+data_med <- combine_p %>% filter(Prize_Winning == "YES", Field == "Medicine")
+
+lm_med_plot <- ggplot(data_med, aes(x = P_Value, y = Citation_Percentile)) +
+  geom_point(color = "red") +
+  geom_smooth(method = "lm", color = "blue", se = FALSE) +
+  labs(title = "Linear Regression: Citation Percentile vs P_Value (Medicine)",
+       x = "P_Value", y = "Citation Percentile") +
   theme_minimal()
-anova_plot
-# p-value (Pr(>F)): 0.821, which is far above the 0.05 significance threshold, 
-# meaning P_bin has no significant effect on Citation_Percentile.
+lm_med_plot
 
-# General Linear Model
-glm_model <- glm(Citation_Percentile ~ P_Value, data, family = poisson(link = "identity"))
-summary(glm_model)
-# Still No Significant
+med_model <- lm(Citation_Percentile ~ P_Value, data = data_med)
+summary(med_model)
 
-# Bayesian Hierarchical Model
-library(brms)
+# Binned by Publication Year
+decade_df <- data %>%
+  mutate(decade_bin = cut(Publication_Year, breaks = seq(1887, 2010, by = 10), include.lowest = TRUE))
 
-bayesian_model <- brm(Citation_Percentile ~ P_Value + (1 | Field), 
-                      data = data, 
-                      family = gaussian(), 
-                      prior = prior(normal(0, 10), class = "b"))
-summary(bayesian_model)
+decade_plot <- ggplot(decade_df, aes(x = Citation_Percentile)) +
+  geom_histogram(binwidth = 0.05, fill = "blue", color = "black") +
+  facet_wrap(~decade_bin, ncol = 5, scales = "free_y") +
+  labs(title = "Citation Percentile Distribution by decade Bins",
+       x = "Citation Percentile", y = "Count of Papers") +
+  theme_minimal()
+decade_plot
+
+# Binned by Gender
+gender_plot <- ggplot(data, aes(x = Citation_Percentile)) +
+  geom_histogram(binwidth = 0.05, fill = "blue", color = "black") +
+  facet_wrap(~Gender, ncol = 5, scales = "free_y") +
+  labs(title = "Citation Percentile Distribution by Gender",
+       x = "Citation Percentile", y = "Count of Papers") +
+  theme_minimal()
+gender_plot
+
+
+
+
+
 
