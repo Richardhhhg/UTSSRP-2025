@@ -24,6 +24,7 @@ combine_p <- df %>%
 
 
 
+
 # Histogram binned by P_value
 chem_p_plot <- ggplot(chem_p, aes(x = Citation_Percentile)) +
   geom_histogram(binwidth = 0.05, fill = "blue", color = "black") +
@@ -111,7 +112,7 @@ lm_chem_plot <- ggplot(data_chem, aes(x = P_Value, y = Citation_Percentile)) +
   theme_minimal()
 lm_chem_plot
 
-chem_model <- lm(Citation_Percentile ~ P_Value, data = data_chem)
+chem_model <- lm(Citation_Percentile ~ P_Value , data = data_chem)
 summary(chem_model)
 
 data_phys <- combine_p %>% filter(Prize_Winning == "YES", Field == "Physics")
@@ -140,26 +141,53 @@ lm_med_plot
 med_model <- lm(Citation_Percentile ~ P_Value, data = data_med)
 summary(med_model)
 
+
+combine_d <- df %>% filter(Prize_Winning == "YES") %>%
+  mutate(decade_bin = cut(Publication_Year, breaks = seq(1880, 2010, by = 10), include.lowest = TRUE))
+
+overall_model <- lm(Citation_Percentile ~ P_Value + as.factor(Field) + decade_bin + as.factor(Gender), data = combine_d)
+summary(overall_model)
+
+overall_model_1 <- lm(Citation_Percentile ~ as.factor(Field) + as.factor(Gender) + as.factor(Field) * as.factor(Gender), data = combine_d)
+summary(overall_model_1)
+
 # Binned by Publication Year
 decade_df <- data %>%
-  mutate(decade_bin = cut(Publication_Year, breaks = seq(1887, 2010, by = 10), include.lowest = TRUE))
+  mutate(decade_bin = cut(Publication_Year, breaks = seq(1880, 2010, by = 10), include.lowest = TRUE))
 
-decade_plot <- ggplot(decade_df, aes(x = Citation_Percentile)) +
+decade_plot_ci <- ggplot(decade_df, aes(x = Citation_Percentile)) +
   geom_histogram(binwidth = 0.05, fill = "blue", color = "black") +
   facet_wrap(~decade_bin, ncol = 5, scales = "free_y") +
   labs(title = "Citation Percentile Distribution by decade Bins",
        x = "Citation Percentile", y = "Count of Papers") +
   theme_minimal()
-decade_plot
+decade_plot_ci
+
+decade_plot_p <- ggplot(decade_df, aes(x = P_Value)) +
+  geom_histogram(binwidth = 0.05, fill = "blue", color = "black") +
+  facet_wrap(~decade_bin, ncol = 5, scales = "free_y") +
+  labs(title = "P_Value Distribution by decade Bins",
+       x = "P_Value", y = "Count of Papers") +
+  theme_minimal()
+decade_plot_p
+
 
 # Binned by Gender
-gender_plot <- ggplot(data, aes(x = Citation_Percentile)) +
+gender_plot_ci <- ggplot(data, aes(x = Citation_Percentile)) +
   geom_histogram(binwidth = 0.05, fill = "blue", color = "black") +
   facet_wrap(~Gender, ncol = 5, scales = "free_y") +
   labs(title = "Citation Percentile Distribution by Gender",
        x = "Citation Percentile", y = "Count of Papers") +
   theme_minimal()
-gender_plot
+gender_plot_ci
+
+gender_plot_p <- ggplot(data, aes(x = P_Value)) +
+  geom_histogram(binwidth = 0.05, fill = "blue", color = "black") +
+  facet_wrap(~Gender, ncol = 5, scales = "free_y") +
+  labs(title = "P_Value Distribution by Gender",
+       x = "P_Value", y = "Count of Papers") +
+  theme_minimal()
+gender_plot_p
 
 
 
