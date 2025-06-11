@@ -12,7 +12,7 @@ phys_p <- df %>% filter(Field == "Physics", Prize_Winning == "YES") %>%
   mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
 med_p <- df %>% filter(Field == "Medicine", Prize_Winning == "YES") %>%
   mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
-combine_p <- df %>% filter(Prize_Winning == "YES")
+combine_p <- df %>% filter(Prize_Winning == "YES") %>%
   mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
 
 
@@ -104,7 +104,6 @@ st_plot <- chem_st %>%
        x = "Citation Percentile", y = "Count of Papers") +
   theme_minimal()
 st_plot
-
 
 
 
