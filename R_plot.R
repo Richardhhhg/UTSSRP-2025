@@ -6,11 +6,11 @@ colnames(df) <- c("Laureate", "Title", "Prize_Winning", "P_Value", "Gender",
                   "Field", "Citations_Count", "Citation_Percentile", "Nobel_Citation_Percentile", "Publication_Year")
 
 # Divide by field and P_value
-chem_p <- df %>% filter(Field == "Chemistry") %>% 
+chem_p <- df %>% filter(Field == "Chemistry", Prize_Winning == "YES") %>% 
   mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
-phys_p <- df %>% filter(Field == "Physics") %>%
+phys_p <- df %>% filter(Field == "Physics", Prize_Winning == "YES") %>%
   mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
-med_p <- df %>% filter(Field == "Medicine") %>%
+med_p <- df %>% filter(Field == "Medicine", Prize_Winning == "YES") %>%
   mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
 combine_p <- df %>% filter(Prize_Winning == "YES")
   mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
@@ -48,11 +48,18 @@ med_p_plot
 
 # Plots over Laureate for each field for all papers
 # (too many!!!maybe need sampling)
-chem_pl_plot <- chem_p %>%
+chem_ps <- df %>% filter(Field == "Chemistry") %>% 
+  mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
+phys_ps <- df %>% filter(Field == "Physics") %>%
+  mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
+med_ps <- df %>% filter(Field == "Medicine") %>%
+  mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
+
+chem_pl_plot <- chem_ps %>%
                 ggplot(aes(x = Citation_Percentile)) +
   geom_histogram(binwidth = 0.05, fill = "red", color = "black") +
   facet_wrap(~Laureate) +
-  geom_vline(data = chem_p, 
+  geom_vline(data = chem_ps, 
              aes(xintercept = Nobel_Citation_Percentile),
              color = "blue", linetype = "dashed", linewidth = 0.5) +
   labs(title = "Citation Percentile Distribution by Laureates(Chemistry)",
@@ -60,11 +67,11 @@ chem_pl_plot <- chem_p %>%
   theme_minimal()
 chem_pl_plot
 
-phys_pl_plot <- phys_p %>%
+phys_pl_plot <- phys_ps %>%
   ggplot(aes(x = Citation_Percentile)) +
   geom_histogram(binwidth = 0.05, fill = "red", color = "black") +
   facet_wrap(~Laureate) +
-  geom_vline(data = phys_p, 
+  geom_vline(data = phys_ps, 
              aes(xintercept = Nobel_Citation_Percentile),
              color = "blue", linetype = "dashed", linewidth = 0.5) +
   labs(title = "Citation Percentile Distribution by Laureates(Physics)",
@@ -72,11 +79,11 @@ phys_pl_plot <- phys_p %>%
   theme_minimal()
 phys_pl_plot
 
-med_pl_plot <- med_p %>%
+med_pl_plot <- med_ps %>%
   ggplot(aes(x = Citation_Percentile)) +
   geom_histogram(binwidth = 0.05, fill = "red", color = "black") +
   facet_wrap(~Laureate) +
-  geom_vline(data = med_p, 
+  geom_vline(data = med_ps, 
              aes(xintercept = Nobel_Citation_Percentile),
              color = "blue", linetype = "dashed", linewidth = 0.5) +
   labs(title = "Citation Percentile Distribution by Laureates(Medicine)",
